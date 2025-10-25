@@ -1,0 +1,48 @@
+# Node dependencies and build outputs
+**/node_modules/
+**/dist/
+**/build/
+**/.cache/
+**/.parcel-cache/
+**/.turbo/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.log
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+**/wallet/*.export
+**/wallet/*.json
+
+# Local databases
+**/*.sqlite
+**/*.sqlite3
+**/*.db
+zkshop/backend/zkshop.db
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE settings
+.vscode/
+.idea/
+
+# Coverage
+coverage/
+**/coverage/
+
+# Generated / artifacts
+**/generated/
+**/concordium-out/
+**/module.wasm*
+**/*.wasm
+
+
