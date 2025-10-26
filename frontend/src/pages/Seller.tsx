@@ -19,6 +19,8 @@ function SellerInner(props: WalletConnectionProps & { connectorType: ConnectorTy
   const [uk, setUk] = useState(false);
   const [shop, setShop] = useState<any | null>({ id: 1, name: 'ZKShop', owner: 'central' });
   const [wantConnect, setWantConnect] = useState(false);
+  const [balance, setBalance] = useState<string>('0');
+  const TOKEN_ID = 'EUDemo';
 
   // Central shop: no per-owner fetch
 
@@ -27,13 +29,22 @@ function SellerInner(props: WalletConnectionProps & { connectorType: ConnectorTy
     setActiveConnectorType(props.connectorType);
   }, [setActiveConnectorType, props.connectorType]);
 
-  // Call connect once the activeConnector is ready
+  // Auto-connect if user opted in
   useEffect(() => {
-    if (wantConnect && activeConnector && typeof connect === 'function') {
+    const shouldAuto = localStorage.getItem('zkshop_autoconnect') === '1';
+    if (shouldAuto && !account && typeof connect === 'function' && activeConnector) {
       void connect();
-      setWantConnect(false);
     }
-  }, [wantConnect, activeConnector, connect]);
+  }, [activeConnector, connect, account]);
+
+  useEffect(() => {
+    if (account) {
+      fetch(`http://localhost:4000/plt/balance/${TOKEN_ID}/${account}`)
+        .then((r) => r.json())
+        .then((x) => setBalance(x.balance || '0'))
+        .catch(() => setBalance('0'));
+    }
+  }, [account]);
 
   const createShop = async () => {};
 
@@ -71,7 +82,12 @@ function SellerInner(props: WalletConnectionProps & { connectorType: ConnectorTy
 
   return (
     <>
-    <Header />
+    <Header
+      account={account}
+      onConnect={() => { localStorage.setItem('zkshop_autoconnect', '1'); setActiveConnectorType(props.connectorType); if (typeof connect === 'function') void connect(); }}
+      isConnecting={isConnecting}
+      balanceLabel={account ? `EUDemo ${balance}` : undefined}
+    />
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h5">Shop Config</Typography>

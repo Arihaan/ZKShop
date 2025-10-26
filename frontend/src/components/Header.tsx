@@ -14,7 +14,10 @@ export default function Header(props: { cartCount?: number; account?: string; on
   return (
     <AppBar position="sticky" color="transparent" elevation={0} sx={{ borderBottom: '1px solid rgba(15,23,42,0.06)', backdropFilter: 'blur(6px)' }}>
       <Toolbar sx={{ py: 1 }}>
-        <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', cursor: 'pointer' }} onClick={() => navigate('/')}>ZKShop</Typography>
+        <Box display="flex" alignItems="center" sx={{ cursor: 'pointer' }} onClick={() => navigate('/') }>
+          <img src="/logo.png" alt="logo" style={{ width: 24, height: 24, marginRight: 8, borderRadius: 6 }} />
+          <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary' }}>ZKShop</Typography>
+        </Box>
         <Box sx={{ flexGrow: 1 }} />
         <Button color="inherit" onClick={() => navigate('/store')}>Store</Button>
         <Button color="inherit" onClick={() => navigate('/seller')}>Shop Config</Button>

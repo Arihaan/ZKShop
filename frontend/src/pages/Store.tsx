@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Container, Box, Typography, Grid, Card, CardContent, Button, Chip, Snackbar, Alert, Fab, ButtonGroup, CircularProgress, Stack } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Header from '../components/Header';
-import { WithWallet, BROWSER_WALLET, usePersistedConnect } from '../wallet';
+import { WithWallet, BROWSER_WALLET } from '../wallet';
 import { useConnect, useConnection, WalletConnectionProps, ConnectorType } from '@concordium/react-components';
 import { Web3StatementBuilder, MIN_DATE, getPastDate, AccountAddress, AccountTransactionType, StatementTypes } from '@concordium/web-sdk';
 
@@ -39,7 +39,6 @@ function StoreInner(props: WalletConnectionProps & { connectorType: ConnectorTyp
   const { activeConnector, connectedAccounts, genesisHashes, setActiveConnectorType } = props;
   const { connection, setConnection, account } = useConnection(connectedAccounts, genesisHashes);
   const { connect, isConnecting, connectError } = useConnect(activeConnector, setConnection);
-  const persist = usePersistedConnect(() => { setActiveConnectorType(BROWSER_WALLET); connect(); });
 
   const [products, setProducts] = useState<any[]>([]);
   const [balance, setBalance] = useState<string>('0');
@@ -61,7 +60,19 @@ function StoreInner(props: WalletConnectionProps & { connectorType: ConnectorTyp
   }, []);
 
   useEffect(() => {
-    persist.tryAutoConnect();
+    // Ensure connector type is set on mount
+    setActiveConnectorType(BROWSER_WALLET);
+  }, [setActiveConnectorType]);
+
+  useEffect(() => {
+    // Auto-connect if user opted in and we're not connected yet
+    const shouldAuto = localStorage.getItem('zkshop_autoconnect') === '1';
+    if (shouldAuto && !account && typeof connect === 'function' && activeConnector) {
+      connect();
+    }
+  }, [activeConnector, connect, account]);
+
+  useEffect(() => {
     if (account) {
       fetch(`http://localhost:4000/plt/balance/${TOKEN_ID}/${account}`).then((r) => r.json()).then((x) => setBalance(x.balance || '0'));
     }
@@ -137,7 +148,7 @@ function StoreInner(props: WalletConnectionProps & { connectorType: ConnectorTyp
     <Header
       cartCount={cart.length}
       account={account}
-      onConnect={() => { persist.markConnected(); setActiveConnectorType(BROWSER_WALLET); connect(); }}
+      onConnect={() => { localStorage.setItem('zkshop_autoconnect', '1'); setActiveConnectorType(BROWSER_WALLET); if (typeof connect === 'function') connect(); }}
       isConnecting={isConnecting}
       balanceLabel={account ? `EUDemo ${balance}` : undefined}
     />

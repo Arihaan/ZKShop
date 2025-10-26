@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react';
 import { Container, Box, Typography, Paper, Button, List, ListItem, ListItemText, Divider, Chip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import React from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import Header from '../components/Header';
+import Checkmark from '../components/Checkmark';
 import { WithWallet, BROWSER_WALLET } from '../wallet';
 import { useConnect, useConnection, WalletConnectionProps, ConnectorType } from '@concordium/react-components';
 import { AccountTransactionType, getAccountTransactionHandler } from '@concordium/web-sdk';
@@ -15,6 +17,12 @@ function CheckoutInner(props: WalletConnectionProps & { connectorType: Connector
   const { activeConnector, connectedAccounts, genesisHashes, setActiveConnectorType } = props;
   const { connection, setConnection, account } = useConnection(connectedAccounts, genesisHashes);
   const { connect, isConnecting } = useConnect(activeConnector, setConnection);
+  // Persisted auto-connect like Store
+  React.useEffect(() => { setActiveConnectorType(BROWSER_WALLET); }, [setActiveConnectorType]);
+  React.useEffect(() => {
+    const shouldAuto = localStorage.getItem('zkshop_autoconnect') === '1';
+    if (shouldAuto && !account && typeof connect === 'function' && activeConnector) connect();
+  }, [activeConnector, connect, account]);
   const navigate = useNavigate();
   const location = useLocation();
   const stateItems: CartItem[] = (location.state?.items as CartItem[]) || [];
@@ -114,9 +122,14 @@ function CheckoutInner(props: WalletConnectionProps & { connectorType: Connector
       <Dialog open={successOpen} onClose={() => setSuccessOpen(false)}>
         <DialogTitle>Payment Successful</DialogTitle>
         <DialogContent>
-          <Typography>Your EUDemo payment has been submitted.</Typography>
+          <Box display="flex" alignItems="center" gap={2}>
+            <Checkmark />
+            <Typography>Your EUDemo payment has been submitted.</Typography>
+          </Box>
           {txHash && (
-            <Typography sx={{ mt: 1 }}>Transaction: <a href={`https://dashboard.testnet.concordium.com/lookup/transaction/${txHash}`} target="_blank" rel="noreferrer">{txHash}</a></Typography>
+            <Typography sx={{ mt: 1, overflowWrap: 'anywhere', wordBreak: 'break-all' }}>
+              Transaction: <a href={`https://ccdexplorer.io/testnet/transaction/${txHash}`} target="_blank" rel="noreferrer">{txHash}</a>
+            </Typography>
           )}
         </DialogContent>
         <DialogActions>
