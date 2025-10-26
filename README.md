@@ -1,6 +1,6 @@
 # ZKShop (Concordium PoC)
 
-<img width="1920" height="1080" alt="displayimage1" src="https://github.com/user-attachments/assets/7f4b905d-680e-41c7-9f9e-cc0356d43621" />
+<img width="1920" height="1080" alt="displayimage1" src="https://github.com/user-attachments/assets/7292cb75-dc46-43fc-b3a4-b316baddeea1" />
 
 A lightweight, modern demo shop for the Concordium blockchain that showcases:
 
