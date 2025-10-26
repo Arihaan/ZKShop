@@ -1,5 +1,7 @@
 # ZKShop (Concordium PoC)
 
+<img width="1920" height="1080" alt="displayimage1" src="https://github.com/user-attachments/assets/7f4b905d-680e-41c7-9f9e-cc0356d43621" />
+
 A lightweight, modern demo shop for the Concordium blockchain that showcases:
 
 - Zero-knowledge gated products (18+ and UK nationality)
